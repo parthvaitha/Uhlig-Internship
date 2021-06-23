@@ -1,0 +1,30 @@
+####DAX data loading####
+DAX <- data.frame('Age'=DAX_data$Age)
+DAX$MarketCap <- DAX_data$`Market Cap in M`
+head(DAX)
+?gsub
+DAX$MarketCap <- gsub(" EUR", "", DAX$MarketCap)
+DAX$MarketCap <- gsub(",", "", DAX$MarketCap)
+DAX$MarketCap <- as.numeric(DAX$MarketCap)
+head(DAX)
+########
+####Correlation Tests and Graph generation####
+cor.test(DAX$MarketCap, DAX$Age)
+summary(DAX$Age)
+DAX$Age_bins <- cut(DAX$Age,
+                       breaks = c(0,20,40,60,80,100,120,140,160,180,200,400),
+                       na.rm=TRUE,
+                       right=TRUE,
+                       include.lowest = TRUE,
+                       labels= NULL)
+DAX <- na.omit(DAX)
+ggplot(DAX, aes(Age_bins))+ geom_bar() + 
+  labs(title = "Distribution of DAX Companies by Age",
+       x = "Age of Company",
+       y = "Number of Companies")
+ggplot(DAX, aes(x=Age_bins, y=MarketCap))+ 
+  geom_boxplot(outlier.shape = NA)+
+  labs(title = "Age and Market Cap of DAX30",
+       x="Age of Company",
+       y="Market Cap of Company in Millions")
+########
