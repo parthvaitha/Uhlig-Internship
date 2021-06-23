@@ -1,0 +1,38 @@
+####Loading Data####
+CAC <- data.frame('Age'=CAC_data$`Years Since Incorporation`)
+CAC$marketcap <- (CAC_data$`Market Cap`)
+head(CAC)
+########
+####Correlation Test + Graphs####
+cor.test(CAC$Age, CAC$marketcap)
+
+summary(CAC$Age)
+
+CAC$Age_bins <- cut(CAC$Age,
+                     breaks = c(0,10,20,30,40,50,60,70,80),
+                     na.rm=TRUE,
+                     right=TRUE,
+                     include.lowest = TRUE,
+                     labels= NULL)
+CAC <- na.omit(CAC)
+CAC$Age_bins2 <- cut(CAC$Age,
+                      breaks = c(0,20,40,60,80),
+                      na.rm=TRUE,
+                      right=TRUE,
+                      include.lowest = TRUE,
+                      labels= NULL)
+
+summary(CAC$Age_bins)
+summary(CAC$Age_bins2)
+ggplot(CAC, aes(Age_bins))+ geom_bar() + 
+  labs(title = "Distribution of CAC Companies by Age",
+       x = "Age of Company",
+       y = "Number of Companies")
+ggplot(CAC, aes(x=Age_bins, y=marketcap))+ 
+  geom_boxplot(outlier.shape = NA) +
+  labs(title = "Age and Market Cap of CAC40",
+       x = "Age of Company",
+       y="Market Cap of Company") +
+  ylim(0,250000000000)
+########
+
