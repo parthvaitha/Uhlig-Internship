@@ -1,0 +1,122 @@
+####Packages####
+library(foreign)
+library(ggplot2)
+install.packages("dotwhisker")
+library(dotwhisker)
+library(broom)
+library(survey)
+library(stargazer)
+library(xtable)
+library(tidyverse)
+library(haven)
+library(knitr)
+install.packages("ggiraphExtra")
+library(ggiraphExtra)
+install.packages("psych", dependencies = TRUE)
+install.packages("psych", repos="http://personality-project.org/r", type="source" )
+library(psych)
+options(xtable.comment=FALSE)
+########
+####Loading Data + Correlation Test####
+snp500 <- data.frame('Age'=SnP500_data$`Years Since Incorporation`)
+snp500$marketcap <- SnP500_data$`Market Cap`
+head(snp500)
+summary(snp500$Age)
+summary(snp500$marketcap)
+cor.test(snp500$Age,snp500$marketcap)
+########
+####Graphical Representation####
+snp500$Age_bins <- cut(snp500$Age,
+                       breaks = c(0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170),
+                       na.rm=TRUE,
+                       right=TRUE,
+                       include.lowest = TRUE,
+                       labels= NULL)
+
+snp500$Age_bins2 <- cut(snp500$Age,
+                       breaks = c(0,20,40,60,80,100,120,140,160,180),
+                       na.rm=TRUE,
+                       right=TRUE,
+                       include.lowest = TRUE,
+                       labels= NULL)
+
+ggplot(snp500, aes(Age_bins))+ geom_bar() + 
+  labs(title = "Distribution of S&P500 Companies by Age",
+       x = "Age of Company",
+       y = "Number of Companies")
+ggplot(snp500, aes(x=Age_bins2, y=marketcap))+ 
+  geom_boxplot(outlier.shape = NA)+
+  labs(title = "Age and Market Cap of S&P500 Companies",
+       x= "Age of Company",
+       y="Market Cap of Company")+
+  ylim(0,500000000000)
+
+totalmarketcap = sum(snp500$marketcap, na.rm = TRUE)
+snp500$percentmcap <- ((snp500$marketcap)/totalmarketcap)*100
+
+ggplot(snp500, aes(x=Age_bins, y=percentmcap))+
+  geom_col()+
+  labs(title = "Age and Market Cap of S&P500",
+       x = "Age of Company",
+       y = "Percentage of S&P500 Market Cap")
+
+########
+####Extra Stuff####
+
+snp500.a <- subset(snp500, snp500$Age_bins == "[0,10]")
+snp500.b <- subset(snp500, snp500$Age_bins == "(10,20]")
+snp500.c <- subset(snp500, snp500$Age_bins == "(20,30]")
+snp500.d <- subset(snp500, snp500$Age_bins == "(88.9,118]")
+snp500.e <- subset(snp500, snp500$Age_bins == "(118,148]")
+snp500.f <- subset(snp500, snp500$Age_bins == "(148,178]")
+snp500.g <- subset(snp500, snp500$Age_bins == "(178,207]")
+snp500.h <- subset(snp500, snp500$Age_bins == "(207,237]")
+summary(snp500.c)
+sum(snp500.b$marketcap)
+boxplot(snp500.h$marketcap)
+
+
+mean(snp500.a$marketcap)
+means_list <- c(mean(snp500.a$marketcap),
+                mean(snp500.b$marketcap),
+                mean(snp500.c$marketcap),
+                mean(snp500.d$marketcap),
+                mean(snp500.e$marketcap),
+                mean(snp500.f$marketcap),
+                mean(snp500.g$marketcap),
+                mean(snp500.h$marketcap)
+                )
+
+median(snp500.a$marketcap)
+median_list <- c(median(snp500.a$marketcap),
+                 median(snp500.b$marketcap),
+                 median(snp500.c$marketcap),
+                 median(snp500.d$marketcap),
+                 median(snp500.e$marketcap),
+                 median(snp500.f$marketcap),
+                 median(snp500.g$marketcap),
+                 median(snp500.h$marketcap))
+median_list
+mnm <- data.frame('Mean' = means_list)
+mnm$Median <- median_list
+summary(snp500$Age_bins)
+mnm$interval <- NA
+mnm$interval <- c("(-0.237,29.6]",
+                  "(29.6,59.2]",
+                  "(59.2,88.9]",
+                  "(88.9,118]",
+                  "(118,148]",
+                  "(148,178]",
+                  "(178,207]",
+                  "(207,237]")
+ggplot(mnm, aes(x=interval, y=Median)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Median Market Cap",
+       x = "Age of Company",
+       y = "Median in Millions of $")
+ggplot(mnm, aes(x=interval, y=Mean)) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  labs(title = "Mean Market Cap",
+       x = "Age of the Company",
+       y = "Mean in Millions of $")
+########
