@@ -1,0 +1,31 @@
+####Loading Data####
+eurosnp <- data.frame('Age'=SnpEuro350$`Age`)
+eurosnp$marketcap <- (SnpEuro350$`Market Cap in $`)
+summary(eurosnp$Age)
+summary(eurosnp$marketcap)
+eurosnp$marketcap <- as.numeric(eurosnp$marketcap)
+head(eurosnp)
+########
+####Graphical Representation####
+eurosnp$Age_bins <- cut(eurosnp$Age,
+                       breaks = c(0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180),
+                       na.rm=TRUE,
+                       right=TRUE,
+                       include.lowest = TRUE,
+                       labels= NULL)
+
+ggplot(eurosnp, aes(Age_bins))+ geom_bar() + 
+  labs(title = "Distribution of Euro S&P350 Companies by Age",
+       x = "Age of Company",
+       y = "Number of Companies")
+
+totaleumarketcap = sum(eurosnp$marketcap, na.rm = TRUE)
+eurosnp$percentmcap <- ((eurosnp$marketcap)/totaleumarketcap)*100
+
+ggplot(eurosnp, aes(x=Age_bins, y=percentmcap))+
+  geom_col()+
+  labs(title = "Age and Market Cap of EuroS&P",
+       x = "Age of Company",
+       y = "Percentage of EuroS&P Market Cap")+
+  theme(axis.text.x = element_text(angle = 45))
+########
