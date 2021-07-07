@@ -1,0 +1,6 @@
+ggplot(NULL, aes(x=Age, y=(percentmcap)))+
+  stat_ecdf(data = snp500, geom = "line", color = "green")+
+  stat_ecdf(data = eurosnp, geom = "line", color = "red")+
+  labs(title = "Cumulative distribution of Age and Market Cap",
+       x = "Age of Company",
+       y = "Percentage of Market Cap")
